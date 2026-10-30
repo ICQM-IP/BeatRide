@@ -1,0 +1,24 @@
+const notes=(positions,options={})=>positions.map((at,i)=>({at,...options,accent:options.accent??i===0}));
+const even=(step=1)=>notes(Array.from({length:Math.round(4/step)},(_,i)=>i*step));
+const directions=pattern=>pattern.map(n=>({...n,stroke:Math.round(n.at*2)%2?'U':'D'}));
+export const LESSONS=[
+ {id:'subdivision',group:'基礎',title:'細分切換',skill:'主拍不變，密度改變',guide:'數 1 2 3 4，再數 1 & 2 &，最後數 1 e & a。每兩小節改變一次密度，BPM 不變。',guitar:'先用一條空弦交替撥弦；保持腳打四分主拍，不隨撥弦密度加速。',pattern:b=>even([1,.5,.25,.5][Math.floor(b/2)%4])},
+ {id:'rests',group:'基礎',title:'休止與重入',skill:'不發聲時，拍子仍然繼續',guide:'在亮起的格子打拍，空格不要打。第 3 拍重新進入；不要把休止當作結束。',guitar:'在休止處停止弦的聲音。先用悶弦與單一和弦，避免換和弦分心。',grid:.5,pattern:()=>[{at:0},{at:.5},{at:2,reentry:true},{at:3}]},
+ {id:'offbeat',group:'基礎',title:'只打反拍',skill:'聽主拍，打每個 &',guide:'節拍器在數字上，你只打兩拍中間的 &。先慢速數出 1 & 2 & 3 & 4 &。',guitar:'用上掃演奏 &，下掃時空過琴弦；腳繼續踩主拍。',grid:.5,pattern:()=>notes([.5,1.5,2.5,3.5],{stroke:'U'})},
+ {id:'syncopation',group:'基礎',title:'切分與跨拍延音',skill:'長短拍距也可以完全準確',guide:'在 1、2 的 &、4 打拍。2 的 & 長按一拍再放手，跨過第 3 拍不重打。放手只評螢幕手指，不是結他收音。',guitar:'跨拍處讓和弦持續發聲，手的上下運動不中斷。',grid:.5,pattern:()=>[{at:0,stroke:'D'},{at:1.5,hold:1,stroke:'U'},{at:3,reentry:true,stroke:'D'}]},
+ {id:'strum',group:'基礎',title:'上下掃弦與空掃',skill:'手不停，琴弦可以不發聲',guide:'箭頭表示持續的上下運動；只在實心格打拍。空掃不是新音符，不需要點擊。',guitar:'練下、下上、上、下上。箭頭只是本課指定動作，不代表所有風格都必須交替掃弦。',grid:.5,pattern:()=>directions(notes([0,1,1.5,2.5,3,3.5]))},
+ {id:'accents',group:'基礎',title:'重音移位',skill:'同樣音符，不同律動',guide:'聽連續十六分音符，只在較響的重音打拍。每兩小節重音依次移到數字、e、&、a。本課評重音位置，不評觸控力度。',guitar:'其餘音符輕彈，重音較明顯；腳仍踩四分主拍，不跟著重音改位置。',accentOnly:true,pattern:b=>even(.25).map(n=>({...n,accent:Math.round(n.at*4)%4===Math.floor(b/2)%4}))},
+ {id:'sparse',group:'基礎',title:'少一點節拍提示',skill:'從跟 click 到自己維持',guide:'每兩小節由每拍 click 改為只在 2、4、每小節一次，最後完全無聲。BPM 仍指四分主拍，兩聲 click 不代表速度減半。無聲段不顯示流動拍點，請持續打主拍。',guitar:'用簡單單弦或和弦；無聲段仍保持腳與手的內在拍子。',clicks:b=>['all','backbeat','bar','none'][Math.floor(b/2)%4],pattern:b=>even().map(n=>({...n,silent:Math.floor(b/2)%4===3}))},
+ {id:'silent',group:'基礎',title:'有聲／無聲交替',skill:'聽到提示回來時仍對得上',guide:'4 拍有聲、4 拍無聲。逐步切換到 8 拍有聲／8 拍無聲及更長無聲段。無聲段隱藏拍點。',guitar:'先彈單一和弦，留意提示恢復時是否已加速或減慢。',clicks:b=>b%2===0?'all':'none',pattern:b=>even().map(n=>({...n,silent:b%2===1}))},
+ {id:'feel',group:'基礎',title:'直拍、三連音、Shuffle',skill:'先聽懂，再切換',guide:'每兩小節切換直八分、三連音、三連音式 Shuffle、直八分。Shuffle 先用 2:1 作教學範例，不代表所有 Swing 都固定此比例。',guitar:'用單一和弦比較均分與長短感；不要把 Shuffle 彈成不穩的直八分。',grid:1/3,pattern:b=>{const kind=Math.floor(b/2)%4;return kind===1?even(1/3):kind===2?notes([0,2/3,1,1+2/3,2,2+2/3,3,3+2/3]):even(.5)}},
+ {id:'imitation',group:'基礎',title:'聽一句，回一句',skill:'記住整個節奏，不只追逐光點',guide:'先聽指定的一至四小節，再原樣打回。回應段不顯示答案位置，只有主拍參考。可選 1、2、4 小節句長。',guitar:'先悶弦模仿，熟練後再加和弦。',imitation:true,grid:.5,pattern:b=>notes([[0,1,2.5,3],[0,.5,2,3.5],[0,1.5,2.5,3],[.5,1,2,3.5]][b%4])},
+ {id:'ensemble',group:'基礎',title:'跟鼓與 Bass 合奏',skill:'找到整個樂隊的共同主拍',guide:'聽原創合成鼓與 Bass 循環，跟著目標節奏打拍。先分辨低鼓與軍鼓，再加入切分。',guitar:'和弦不要蓋過所有鼓點；留白、短音與重音一起形成律動。',backing:true,grid:.5,pattern:()=>notes([0,1.5,2,3.5])},
+ {id:'rock',group:'Rock / Metal',title:'八分下撥與 Palm Mute',skill:'均勻、緊實、不要越彈越快',guide:'跟著八分音符位置打拍，示範會交替短悶音與較開放的聲音。螢幕只評起音時間。',guitar:'本課指定全下撥，輕放掌側在琴橋附近，交替悶音與開放重音；不要為速度用力繃緊手腕。',pattern:()=>even(.5).map((n,i)=>({...n,stroke:'D',mute:i%4!==0,accent:i%4===0}))},
+ {id:'gallop',group:'Rock / Metal',title:'Gallop 與反向 Gallop',skill:'長短組合清楚，休止不搶',guide:'前四小節用八分＋兩個十六分；後四小節用兩個十六分＋八分。按指定位置，不以拍距一樣評分。',guitar:'先用單一低音弦，慢速比較兩種重心；可先交替撥弦，動作舒適後再換指定撥法。',pattern:b=>notes(Array.from({length:4},(_,i)=>(b<4?[0,.5,.75]:[0,.25,.5]).map(x=>i+x)).flat())},
+ {id:'rock-rest',group:'Rock / Metal',title:'Riff 停頓與重新進入',skill:'收得乾淨，進得準確',guide:'在短句之間保留完整休止，重入拍會獨立統計偏差。',guitar:'先悶弦練停頓，確認沒有多餘弦聲，再加入 Power Chord。實際雜音與收音需自己聽查。',grid:.25,pattern:()=>notes([0,.5,.75,2,2.5,2.75]).map((n,i)=>({...n,mute:true,reentry:i===3}))},
+ {id:'funk',group:'Funk / R&B',title:'十六分掃弦與悶弦',skill:'持續的手，選擇性的聲音',guide:'示範包含重音及短促悶弦 x。螢幕跟所有起音；不測量你實際的掃弦方向、音量或悶音音色。',guitar:'右手保持十六分運動，左手輕鬆放開壓力作悶弦；在標記重音發聲。',pattern:()=>even(.25).map((n,i)=>({...n,stroke:i%2?'U':'D',mute:![0,3,6,10,14].includes(i),accent:[0,3,6,10,14].includes(i)}))},
+ {id:'funk-space',group:'Funk / R&B',title:'Funk 留白與反拍重音',skill:'少彈幾下，律動仍然完整',guide:'短音放在指定反拍，其他格子留空。評分會計休止多打，而不是只獎勵打得密。',guitar:'用兩三條弦的小和弦，空掃保持運動；與鼓、Bass 留出空間。',backing:true,grid:.25,pattern:()=>notes([.5,1.75,2.5,3.25],{accent:true})},
+ {id:'blues',group:'Blues',title:'十二小節 Blues',skill:'節奏與曲式一起記住',guide:'完整走一次 E 調十二小節，顯示 E7／A7／B7。跟著 Shuffle 起音打拍，不判斷你的和弦是否正確。',guitar:'用 E7、A7、B7 或簡單低音型；留意第 9 小節及最後回到開頭的時機。',bars:12,backing:true,blues:true,grid:1/3,pattern:()=>notes([0,2/3,1,1+2/3,2,2+2/3,3,3+2/3])},
+ {id:'blues-phrase',group:'Blues',title:'Blues 樂句與收尾',skill:'三連音後留白，再回主拍',guide:'前三拍是三連音短句，最後一拍休止。下一小節第 1 拍重新進入。',guitar:'用一兩個音演奏短句，留出最後一拍的呼吸；實際延音與收音由自己檢查。',grid:1/3,pattern:()=>notes([0,1/3,2/3,1,1+2/3,2]).map((n,i)=>({...n,reentry:i===0}))}
+];
+export const DAILY=['subdivision','rests','syncopation','sparse','ensemble'];

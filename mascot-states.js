@@ -1,0 +1,3 @@
+export const MASCOT_STATES=[['idle','Idle','待機 · 自信站姿'],['groove','Groove','踏腳跟拍'],['bob','Head Bob','點頭搖擺'],['play','Play','彈結他 Solo'],['jump','Jump','跳躍慶祝'],['push','Push','推墨鏡'],['shuffle','Dance Shuffle','左右舞步'],['slide','Slide','Moonwalk 滑步'],['recover','Fall & Recover','跌倒再起'],['victory','Victory','勝利舞']];
+export function rewardFor({error,streak=0}={}){if(error==null)return 'bob';if(Math.abs(error)>.07)return 'recover';if(streak>0&&streak%16===0)return 'slide';if(streak>0&&streak%12===0)return 'shuffle';if(streak>0&&streak%8===0)return 'push';if(streak>0&&streak%4===0)return 'play';return Math.abs(error)<=.04?'jump':'bob'}
+export function safeMascotState(state,hidden=false){return hidden?'idle':MASCOT_STATES.some(s=>s[0]===state)?state:'idle'}

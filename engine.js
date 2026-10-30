@@ -69,7 +69,9 @@ export class Scorer {
   constructor(){this.taps=[];this.errors=[];this.used=new Set();this.streak=0;this.best=0;this.duplicates=0;}
   tap(time,beats=null,offset=0,tolerance=.15){
     if(!Number.isFinite(time))return {ignored:true};
-    if(this.taps.length&&time-this.taps.at(-1)<.08)return {ignored:true};
+    const gaps=beats?.slice(1).map((t,i)=>t-beats[i]).filter(x=>x>0)||[];
+    const debounce=gaps.length?Math.max(.012,Math.min(.08,Math.min(...gaps)*.4)):.08;
+    if(this.taps.length&&time-this.taps.at(-1)<debounce)return {ignored:true};
     this.taps.push(time);
     if(!beats)return {stability:stability(this.taps)};
     const hit=nearestBeat(time-offset,beats);
